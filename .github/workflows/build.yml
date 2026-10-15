@@ -14,7 +14,15 @@ jobs:
     runs-on: macos-14
     steps:
       - uses: actions/checkout@v4
-      - run: swift test
+      - name: Test
+        shell: bash
+        run: |
+          set +e
+          swift test 2>&1 | tee test.log
+          code=${PIPESTATUS[0]}
+          # Surface problems as annotations (readable without downloading logs).
+          grep -E "error:|failed|Fatal|Executed" test.log | head -40 | while IFS= read -r l; do echo "::error::${l:0:900}"; done
+          exit $code
       - run: ./build.sh
       - uses: actions/upload-artifact@v4
         with:

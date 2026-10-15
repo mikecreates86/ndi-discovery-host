@@ -2,7 +2,7 @@
 
 A menu bar app that runs the NDI Discovery Server and keeps it running. It replaces the Terminal window you would otherwise leave open. Emmaus Church production network.
 
-It does not include the NDI program. Install the free **NDI SDK for Apple** first. The app uses
+It does not include the NDI program. Install the free **NDI SDK for Apple** first ([download page](https://ndi.video/for-developers/ndi-sdk/)). If it is missing, the menu shows a "Download the NDI SDK…" item that opens that page, and the server starts by itself within 30 seconds of the SDK being installed. The app uses
 `/Library/NDI SDK for Apple/bin/Application.Mac.NDI.DirectoryService`, or any location you pick from the menu.
 
 ## READ FIRST: what is and is not verified

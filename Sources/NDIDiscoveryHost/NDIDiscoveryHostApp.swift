@@ -54,6 +54,11 @@ struct MenuContent: View {
         }
         Divider()
 
+        if model.serverMissing {
+            Button("Download the NDI SDK… (needed once)") { model.openSDKDownload() }
+            Divider()
+        }
+
         Button("Restart Server") { model.supervisor.restart() }
         if model.isStopped {
             Button("Start Server") { model.launchServer() }

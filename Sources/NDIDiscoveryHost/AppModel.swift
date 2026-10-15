@@ -65,6 +65,13 @@ final class AppModel: ObservableObject {
 
     // MARK: Display
 
+    /// True until the NDI SDK (or a chosen server program) is actually there.
+    var serverMissing: Bool { !FileManager.default.isExecutableFile(atPath: Settings.serverPath) }
+
+    func openSDKDownload() {
+        if let url = URL(string: NDIServer.sdkDownloadURL) { NSWorkspace.shared.open(url) }
+    }
+
     var statusText: String { state.statusText() }
     var isStopped: Bool { if case .stopped = state { return true } else { return false } }
     var addresses: [DeviceAddress] { NetworkInfo.ipv4Addresses() }

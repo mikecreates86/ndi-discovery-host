@@ -6,6 +6,7 @@ import Foundation
 /// update `port` and `arguments` here if the results differ.
 public enum NDIServer {
     public static let defaultPath = "/Library/NDI SDK for Apple/bin/Application.Mac.NDI.DirectoryService"
+    public static let sdkDownloadURL = "https://ndi.video/for-developers/ndi-sdk/"
     public static let port: UInt16 = 5959      // UNVERIFIED (NDI's documented default)
     public static let arguments: [String] = [] // UNVERIFIED: none assumed
 }

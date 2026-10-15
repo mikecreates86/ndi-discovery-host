@@ -1,11 +1,10 @@
 # Builds the Mac app on GitHub's Macs, so nobody needs Xcode installed.
-# Runs on every push. Download the zip from the run's "Artifacts" section
-# (Actions tab > latest run), or from Releases after tagging a version (git tag v1.0.0).
+# Every push to main rebuilds and replaces the "Latest" release, so the Releases page
+# always has the newest zip. (Run's "Artifacts" section also has a copy.)
 name: Build app
 on:
   push:
     branches: [main]
-    tags: ["v*"]
   workflow_dispatch:
 permissions:
   contents: write
@@ -28,8 +27,11 @@ jobs:
         with:
           name: NDI-Discovery-Host
           path: build/*.zip
-      - name: Attach to release
-        if: startsWith(github.ref, 'refs/tags/v')
-        run: gh release create "${{ github.ref_name }}" build/*.zip --title "${{ github.ref_name }}" --generate-notes
+      - name: Publish as the Latest release
+        run: |
+          gh release delete latest --cleanup-tag --yes || true
+          gh release create latest build/*.zip --target "$GITHUB_SHA" --latest \
+            --title "Latest (version $(cat VERSION))" \
+            --notes "Built automatically from the newest commit on main ($(git rev-parse --short HEAD)). Unzip, drag to Applications, right-click > Open the first time. Needs the free NDI SDK installed."
         env:
           GH_TOKEN: ${{ github.token }}

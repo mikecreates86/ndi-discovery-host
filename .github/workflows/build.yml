@@ -1,0 +1,27 @@
+# Builds the Mac app on GitHub's Macs, so nobody needs Xcode installed.
+# Runs on every push. Download the zip from the run's "Artifacts" section
+# (Actions tab > latest run), or from Releases after tagging a version (git tag v1.0.0).
+name: Build app
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - run: swift test
+      - run: ./build.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: NDI-Discovery-Host
+          path: build/*.zip
+      - name: Attach to release
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: gh release create "${{ github.ref_name }}" build/*.zip --title "${{ github.ref_name }}" --generate-notes
+        env:
+          GH_TOKEN: ${{ github.token }}

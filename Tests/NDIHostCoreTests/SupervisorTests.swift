@@ -27,6 +27,13 @@ final class Recorder {
     var sawStates: [ServerState] { lock.lock(); defer { lock.unlock() }; return states }
 }
 
+// File-level so the global bind() isn't shadowed by an XCTestCase method of the same name.
+func socketBind(_ fd: Int32, _ addr: inout sockaddr_in) -> Int32 {
+    withUnsafePointer(to: &addr) {
+        $0.withMemoryRebound(to: sockaddr.self, capacity: 1) { bind(fd, $0, socklen_t(MemoryLayout<sockaddr_in>.size)) }
+    }
+}
+
 final class SupervisorTests: XCTestCase {
     var dir: URL!
     var script: String { dir.appendingPathComponent("fake-server.sh").path }
@@ -240,10 +247,7 @@ final class SupervisorTests: XCTestCase {
         addr.sin_family = sa_family_t(AF_INET)
         addr.sin_addr.s_addr = inet_addr("127.0.0.1")
         addr.sin_port = 0
-        let bound = withUnsafePointer(to: &addr) {
-            $0.withMemoryRebound(to: sockaddr.self, capacity: 1) { bind(fd, $0, socklen_t(MemoryLayout<sockaddr_in>.size)) }
-        }
-        XCTAssertEqual(bound, 0)
+        XCTAssertEqual(socketBind(fd, &addr), 0)
         XCTAssertEqual(listen(fd, 4), 0)
         var len = socklen_t(MemoryLayout<sockaddr_in>.size)
         _ = withUnsafeMutablePointer(to: &addr) {
